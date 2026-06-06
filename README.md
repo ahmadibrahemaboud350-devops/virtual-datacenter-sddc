@@ -36,6 +36,7 @@ The data center engineering was executed through a rigorous 9-stage infrastructu
 └──────────────┬───────────────┘
                │
                ▼
-┌──────────────────────────────┐
+┌─────────────────────────────────┐
 │  Phase 9: Network Virtualization│ ──► Enforced Logical Network Isolation via NSX
-│  & Micro-segmentation        │ ──► Deployed GNS3 Simulation Clusters
+│  & Micro-segmentation           │ ──► Deployed GNS3 Simulation Clusters
+└─────────────────────────────────┘
