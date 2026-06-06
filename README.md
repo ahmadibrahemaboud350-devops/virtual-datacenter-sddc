@@ -1,42 +1,93 @@
-# Enterprise Virtual Data Center & SDDC Deployment 🏢☁️
+# دمج تقنيات المحاكاة الافتراضية وتنسيق الحاويات (DClaaS)
 
-## 📝 Project Overview
-This repository showcases the architectural design and deployment phase blueprints for an enterprise-level Software-Defined Data Center (SDDC) tailored for higher education administrative and staging lab environments. 
+تحتوي هذه المستودعة (Repository) على المخططات، ملفات التكوين (Configuration Files)، والتعليمات البرمجية الخاصة بمشروع التخرج لنيل درجة الإجازة في الهندسة المعلوماتية - قسم الشبكات والنظم الحاسوبية من جامعة دمشق.
 
-The primary milestone was eliminating physical hardware dependencies by building an agile, scalable virtual infrastructure engineered for maximum uptime and secure multi-tenant network separation.
+يقدم المشروع نموذجاً تطبيقياً متكاملاً لبناء **البنية التحتية لمركز البيانات كخدمة (Data Center Infrastructure as a Service - DClaaS)** عبر دمج بيئات المحاكاة الافتراضية للمؤسسات مع أنظمة تنسيق الحاويات الحديثة في بيئة سحابية متعددة المستأجرين (Multi-Tenant).
 
 ---
 
-## 🏗️ 9-Phase Core Deployment Architecture
-The data center engineering was executed through a rigorous 9-stage infrastructure lifecycle:
+## 🚀 نظرة عامة على المشروع
 
-```text
-┌──────────────────────────────┐
-│  Phase 1 & 2: Bare-Metal     │ ──► Deployed 3x ESXi 7 U2 Hosts
-│  & iSCSI NAS Storage         │ ──► Configured LUNs on shared storage
-└──────────────┬───────────────┘
-               │
-               ▼
-┌──────────────────────────────┐
-│  Phase 3: Central Orchestration│ ──► Spun up vCenter 8 Engine
-│  & Resource Pooling          │ ──► Activated vMotion, DRS, and HA Clusters
-└──────────────┬───────────────┘
-               │
-               ▼
-┌──────────────────────────────┐
-│  Phase 4, 5 & 6: Operations, │ ──► Observability: Zabbix & PRTG
-│  Security & Backup Core      │ ──► DR: Veeam Backup & Recovery
-│                              │ ──► Security: Kaspersky Master Node
-└──────────────┬───────────────┘
-               │
-               ▼
-┌──────────────────────────────┐
-│  Phase 7 & 8: Automation     │ ──► IaC: Ansible Playbooks for provisioning
-│  & Educational Services      │ ──► Services: Apache Web Clusters, Postfix Mail
-└──────────────┬───────────────┘
-               │
-               ▼
-┌─────────────────────────────────┐
-│  Phase 9: Network Virtualization│ ──► Enforced Logical Network Isolation via NSX
-│  & Micro-segmentation           │ ──► Deployed GNS3 Simulation Clusters
-└─────────────────────────────────┘
+الهدف الأساسي للمشروع هو سد الفجوة بين البنية التحتية التقليدية المبنية على الآلات الافتراضية (VMs) والتوجه الحديث نحو التطبيقات السحابية الأصلية المبنية على الحاويات (Containers). تم بناء بيئة سحابية هجينة تتيح للمستأجرين إدارة موارد الحوسبة، الشبكات، والتخزين، بالإضافة إلى نشر وإدارة مجموعات Kubernetes تلقائياً وعبر واجهات رسومية مبسطة.
+
+---
+
+## 🛠 مصفوفة التقنيات والأنظمة (Tech Stack)
+
+| النظام / المنصة | الإصدار | الوظيفة والدور في المشروع |
+| :--- | :--- | :--- |
+| **VMware ESXi** | `8.0.0` / `8.0.2` | نظام تشغيل المضيفات الافتراضية الأساسي (Hypervisor). |
+| **vCenter Server** | `8.0.2` | الإدارة المركزية للموارد، المضيفات، والكتل (Clusters). |
+| **VMware NSX-T** | `4.1.2` | الشبكات المعرفة بالبرمجيات (SDN) والجدران النارية الموزعة (DFW). |
+| **VMware Cloud Director** | `10.6` | بناء وإدارة بيئة سحابية متعددة المستأجرين (Multi-Tenant). |
+| **vRealize Operations** | `8.18.3` | المراقبة الذكية، التحليل الاستباقي للأداء، والتنبؤ بسعة الموارد. |
+| **VMware Horizon** | `8` | تقديم وإدارة بيئات سطح المكتب الافتراضي (VDI). |
+| **Kubernetes** | عبر `kubeadm` | إدارة وتنسيق الحاويات وتشغيل التطبيقات السحابية الأصلية. |
+| **Portainer** | واجهة رسومية | تبسيط إدارة بيئة الحاويات والخدمات للمستأجرين. |
+| **PRTG Network Monitor** | منصة مركزية | مراقبة أداء الشبكة، الخوادم، والخدمات الحيوية في الوقت الحقيقي. |
+| **Veeam Backup & Replication** | `v12` | حماية البيانات، النسخ الاحتياطي المجدول، والتعافي من الكوارث. |
+| **Ansible & Terraform** | IaC | أتمتة عمليات النشر والإعداد وتقليل الأخطاء البشرية. |
+
+---
+
+## 💻 مواصفات العتاد الفيزيائي (Hardware Architecture)
+
+### 1. الخوادم الفيزيائية (HPE ProLiant DL380 Gen9)
+* **المعالج:** Intel Xeon E5-2630 v4 (20 Cores @ 2.20 GHz) لكل خادم.
+* **الذاكرة العشوائية (RAM):**
+  * الخادم الأول (`esxi-01a`): **160 جيجابايت**.
+  * الخادم الثاني (`esxi-02a`): **95.87 جيجابايت**.
+* **التخزين المحلي:** `Datastore1` بسعة **989.75 جيجابايت** لكل خادم.
+* **الشبكة:** بطاقات شبكة بسرعة **10 جيجابت/ثانية** مع مزودات طاقة احتياطية ودعم لـ RAID 0/1/5/10.
+
+### 2. وحدة التخزين الشبكية (Synology NAS DS2015xs)
+* **نوع الترتيب (RAID):** Synology Hybrid RAID (SHR) بتحمل خطأ قرص واحد.
+* **السعة الإجمالية:** **8.17 تيرابايت** موزعة على 4 أقراص HDD بسعة 2.73 تيرابايت للقرص.
+* **بروتوكولات الربط:** $iSCSI$ و $NFS$ لتوفير تخزين مشترك يدعم ميزات vMotion و vSphere HA.
+
+---
+
+## 🌐 الهيكلية الشبكية (Network IP Assignment)
+
+* **نطاق شبكة الإدارة الداخلية:** `172.31.1.0/24`
+* **نطاق شبكة Kubernetes الداخلية:** `172.31.2.0/24`
+
+### توزيع عناوين الخوادم والخدمات الحيوية:
+* **vCenter Server VCSA:** `172.31.1.240` (FQDN: `vcsa-01.damascusuniversity.edu.sy`)
+* **ESXi Host 01 / 02:** `172.31.1.241` / `172.31.1.242`
+* **NSX Manager Virtual IP (VIP):** `172.31.1.245`
+* **vCloud Director Nodes:** `172.31.1.223` / `172.31.1.224`
+* **vRealize Operations Manager:** `172.31.1.246`
+* **PRTG Network Monitor:** `172.31.1.55`
+* **Veeam Backup Server:** `172.31.1.60`
+* **Horizon Connection Server:** `172.31.1.50`
+* **Active Directory Domain Controller:** `172.31.1.244` / `172.31.1.249`
+
+---
+
+## 🛡 ميزات التوافر العالي والأمان المنفذة
+
+* **High Availability & DRS:** تفعيل وضع الأتمتة الكاملة (Fully Automated) لتوزيع الأحمال تلقائياً وإعادة تشغيل الآلات فوراً في حال فشل أي مضيف في الـ Cluster.
+* **Fault Tolerance (FT):** تفعيل خاصية FT لحماية الـ Master Node الخاصة بـ Kubernetes لضمان استمرارية أعمال الحاويات دون أي توقف (Zero Downtime).
+* **عزل المستأجرين (Multi-Tenancy Isolation):** بناء 5 مستأجرين مستقلين (Tenant Org) عبر نماذج تخصيص مرنة (Allocation Pool, Reservation, Pay-As-You-Go) مع عزل شبكي كامل لطبقة الـ Overlay باستخدام تكنولوجيا الـ VXLAN/Geneve عبر NSX-T.
+
+---
+
+## 🔮 الخطط المستقبلية لدمج الذكاء الاصطناعي (AI Integration)
+
+1. **المراقبة الذكية والاستباقية:** دمج نماذج التعلم الآلي مع Prometheus و Grafana للتنبؤ باختناقات الأداء وسلوك الأنظمة بناءً على الأنماط التاريخية بدلاً من العتبات الثابتة.
+2. **مجدول الحاويات الذكي:** توظيف خوارزميات الذكاء الاصطناعي عبر (AI-driven K8s Schedulers) لتحديد العقد المثالية لتوزيع الحاويات بما يضمن أعلى كفاءة واستهلاك للطاقة.
+3. **أتمتة الحماية والأمن:** استخدام تقنيات الذكاء الاصطناعي لتحليل سلوك مستخدمي VDI وكشف الاختراقات شبكياً عبر حزم الأمان المتقدمة.
+
+---
+
+## 👥 فريق العمل والإشراف
+
+* **إعداد الطلاب:** 
+  * أحمد إبراهيم عبود (تخصص شبكات ونظم حاسوبية).
+  * عمر سامر الزرعي (تخصص شبكات ونظم حاسوبية).
+* **إشراف:** 
+  * الأستاذ الدكتور مياد جابر.
+  * الأستاذ المهندس محمد مرعي.
+
+**جامعة دمشق - كلية الهندسة المعلوماتية - أيلول 2025**
